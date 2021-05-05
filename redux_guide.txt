@@ -1,0 +1,6 @@
+Redux flow (example, search PRODUCT_DETAILS_REQUEST)
+1. Add constants
+2. Add to reducer
+3. register new reducer to store
+4. add action
+5. link to component

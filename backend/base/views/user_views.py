@@ -46,9 +46,10 @@ def registerUser(request):
 
         serializer = UserSerializerWithToken(user, many=False)
         return Response(serializer.data)
-    except:
+    except Exception as e:
+        print(e.args)
         message = {'detail': 'User with this email already exists'}
-        return Response(message, status=status.status.HTTP_400_BAD_REQUEST)
+        return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
@@ -57,6 +58,27 @@ def getUserProfile(request):
     # getting the user from jwt auth -> user model instead of default django auth
     user = request.user
     serializer = UserSerializer(user, many=False)
+    return Response(serializer.data)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def updateUserProfile(request):
+    # getting the user from jwt auth -> user model instead of default django auth
+    user = request.user
+    serializer = UserSerializerWithToken(user, many=False)
+
+    data = request.data
+
+    user.first_name = data['name']
+    user.username = data['email']
+    user.email = data['email']
+
+    if data['password'] != '':
+        user.password = make_password(data['password'])
+
+    user.save()
+
     return Response(serializer.data)
 
 

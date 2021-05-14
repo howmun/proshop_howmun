@@ -7,5 +7,6 @@
   "python.analysis.extraPaths": ["backend"],
   "folders": [],
   "settings": {},
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "python.languageServer": "Pylance"
 }

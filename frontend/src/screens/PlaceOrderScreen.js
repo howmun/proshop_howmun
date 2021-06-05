@@ -18,7 +18,7 @@ function PlaceOrderScreen({ history }) {
     .reduce((acc, item) => acc + item.price * item.qty, 0)
     .toFixed(2);
 
-  cart.shippingPrice = (cart.itemsPrice > 100 ? 0 : 10).toFixed(2);
+  cart.shippingPrice = (cart.itemsPrice > 100 ? 0 : 0.1).toFixed(2);
 
   cart.taxPrice = Number(0.06 * cart.itemsPrice).toFixed(2); // assume 6% tax
 

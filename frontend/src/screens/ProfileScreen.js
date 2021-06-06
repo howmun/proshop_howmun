@@ -35,7 +35,7 @@ function ProfileScreen({ history }) {
     if (!userInfo) {
       history.push("/login");
     } else {
-      if (!user || !user.name || success) {
+      if (!user || !user.name || success || userInfo._id !== user._id) {
         // if update profile success, get userdetails from backend again
         dispatch(getUserDetails("profile"));
         dispatch({ type: USER_UPDATE_PROFILE_RESET }); // reset updateprofile state

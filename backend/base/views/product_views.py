@@ -1,11 +1,12 @@
 from unicodedata import category
 from django.shortcuts import render
 
+from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 
-from ..models import Product
+from ..models import Product, Review
 from base.serializers import ProductSerializer
 
 
@@ -82,3 +83,45 @@ def uploadImage(request):
     product.save()
 
     return Response('Image was uploaded')
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def createProductReview(request, product_id):
+    user = request.user
+    product = Product.objects.get(_id=product_id)
+    data = request.data
+
+    # 1 - review already exists
+    review_exists = product.review_set.filter(user=user).exists()
+
+    if review_exists:
+        content = {'detail': 'Product already reviewed'}
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
+    # 2 - review without rating or rating == 0
+    elif data['rating'] == 0:
+        content = {'detail': 'Please select a rating'}
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
+    # 3 - all good, create the review
+    else:
+        review = Review.objects.create(
+            user=user,
+            product=product,
+            name=user.first_name,
+            rating=data['rating'],
+            comment=data['comment']
+        )
+
+        reviews = product.review_set.all()
+        product.numReviews = len(reviews)
+
+        total_review = 0
+        for i in reviews:
+            total_review += i.rating
+
+        product.rating = total_review / len(reviews)
+        product.save()
+
+        return Response('Review successfully added')

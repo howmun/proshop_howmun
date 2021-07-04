@@ -5,6 +5,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from ..models import Product, Review
 from base.serializers import ProductSerializer
@@ -17,10 +18,27 @@ def getProducts(request):
 
     if query is None:
         query = ''
-    
+
     products = Product.objects.filter(name__icontains=query)
+
+    page = request.query_params.get('page')
+    # replace 1 to 10 to show 10 items per page
+    paginator = Paginator(products, 10)
+
+    try:
+        products = paginator.page(page)
+    except PageNotAnInteger:  # like page is not specific in request
+        products = paginator.page(1)
+    except EmptyPage:  # like requesting page 5 but we only have 4 pages, then return last page
+        products = paginator.page(paginator.num_pages)
+
+    if page is None:  # specifiying here since we need to return page number to user
+        page = 1
+
+    page = int(page)  # making sure we are returning standardized int
+
     serializer = ProductSerializer(products, many=True)
-    return Response(serializer.data)
+    return Response({'products': serializer.data, 'page': page, 'pages': paginator.num_pages})
 
 
 @api_view(['GET'])

@@ -3,7 +3,7 @@
   "[python]": {
     "editor.defaultFormatter": null
   },
-  "python.pythonPath": "venv\\Scripts\\python.exe",
+  "python.pythonPath": "venv/bin/python",
   "python.analysis.extraPaths": ["backend"],
   "folders": [],
   "settings": {},
